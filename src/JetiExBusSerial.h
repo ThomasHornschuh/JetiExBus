@@ -52,7 +52,7 @@ public:
 
 // Teensy
 /////////
-#if defined ( CORE_TEENSY )
+#if defined ( CORE_TEENSY ) || defined ( STM32F3xx )
 
   class JetiExBusTeensySerial : public JetiExBusSerial
   {

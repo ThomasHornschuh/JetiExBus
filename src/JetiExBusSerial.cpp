@@ -33,7 +33,8 @@ IN THE SOFTWARE.
 
 // Teensy
 /////////
-#if defined( CORE_TEENSY )
+#if defined( CORE_TEENSY ) || defined ( STM32F3xx )
+#pragma message "compiling JetiExBusSerial"
 
   JetiExBusSerial * JetiExBusSerial::CreatePort( int comPort )
   {
