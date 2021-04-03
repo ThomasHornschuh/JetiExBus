@@ -52,7 +52,7 @@ public:
 
 // Teensy
 /////////
-#if defined ( CORE_TEENSY ) || defined ( STM32F3xx )
+#if defined ( CORE_TEENSY ) 
 
   class JetiExBusTeensySerial : public JetiExBusSerial
   {
@@ -70,5 +70,24 @@ public:
 
   
 #endif // CORE_TEENSY
+
+#if  defined ( STM32F3xx )
+
+  class JetiExBusSTM32Serial : public JetiExBusSerial
+  {
+  public:
+    JetiExBusSTM32Serial( int comPort = 2 );
+
+	virtual void   begin(uint32_t baud, uint32_t format) { m_pSerial->begin( baud, format ); }
+	virtual size_t write(const uint8_t *buffer, size_t size);
+  virtual int    available(void) { return m_pSerial->available(); }
+	virtual int    read(void) { return m_pSerial->read(); }
+  
+  protected:
+    HardwareSerial * m_pSerial;
+  };
+
+  
+#endif // STM32F3xx
 
 #endif // JETIEXBUSSERIAL_H

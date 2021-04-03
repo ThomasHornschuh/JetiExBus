@@ -33,8 +33,8 @@ IN THE SOFTWARE.
 
 // Teensy
 /////////
-#if defined( CORE_TEENSY ) || defined ( STM32F3xx )
-#pragma message "compiling JetiExBusSerial"
+#if defined( CORE_TEENSY ) 
+
 
   JetiExBusSerial * JetiExBusSerial::CreatePort( int comPort )
   {
@@ -53,3 +53,32 @@ IN THE SOFTWARE.
   }
 
 #endif // CORE_TEENSY 
+
+#if  defined ( STM32F3xx )
+#pragma message "compiling JetiExBusSerial"
+
+//static HardwareSerial _serial ((void*)USART3,HALF_DUPLEX_ENABLED); // Hardcoded to USART3 currently
+
+  JetiExBusSerial * JetiExBusSerial::CreatePort( int comPort )
+  {
+    return new JetiExBusSTM32Serial( comPort );
+  } 
+
+  JetiExBusSTM32Serial::JetiExBusSTM32Serial( int comPort ) 
+  {
+    m_pSerial = new HardwareSerial(PB10); //PB10 / D6
+    m_pSerial->setHalfDuplex();
+
+  }
+
+
+  size_t JetiExBusSTM32Serial::write(const uint8_t *buffer, size_t size)
+  { size_t res;
+    res = m_pSerial->write(buffer, size);
+    //m_pSerial->flush();
+    m_pSerial->enableHalfDuplexRx();
+    return res;
+    
+  }
+
+#endif // STM32F3xx 
