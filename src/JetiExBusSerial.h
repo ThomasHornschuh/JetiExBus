@@ -61,7 +61,7 @@ public:
 
 	virtual void   begin(uint32_t baud, uint32_t format) { m_pSerial->begin( baud, format ); }
 	virtual size_t write(const uint8_t *buffer, size_t size) { return m_pSerial->write(buffer, size); }
-    virtual int    available(void) { return m_pSerial->available(); }
+  virtual int    available(void) { return m_pSerial->available(); }
 	virtual int    read(void) { return m_pSerial->read(); }
   
   protected:
