@@ -39,6 +39,26 @@ IN THE SOFTWARE.
 
 // #define LED_DEBUG
 
+#ifndef LED_JETITX
+	#ifdef LED_BUILTIN_TX // For Sparkfun Pro Micro or compatible boards
+	  #define LED_JETI_TX LED_BUILTIN_TX
+	#elif defined(LED_BUILTIN)
+	  #define LED_JETITX LED_BUILTIN
+	#else
+	  #define LED_JETITX 13
+  #endif  
+#endif
+
+#ifndef LED_JETIRX
+	#ifdef LED_BUILTIN_RX // For Sparkfun Pro Micro or compatible boards
+	  #define LED_JETI_RX LED_BUILTIN_RX
+	#elif defined(LED_BUILTIN)
+	  #define LED_JETIRX LED_BUILTIN
+	#else
+	  #define LED_JETIRX 13
+	#endif
+#endif	
+
 JetiExBusAtMegaSerial * _pInstance = 0;   // instance pointer to find the serial object from ISR
 
 JetiExBusSerial * JetiExBusSerial::CreatePort(int comPort)
@@ -59,6 +79,7 @@ void JetiExBusAtMegaSerial::begin(uint32_t baud, uint32_t format)
   UBRRH = 0x00;
   UBRRL = 0x07; // 125000 Bit/s
 #elif F_CPU == 8000000L   // for the 8 MHz internal clock (Pro Mini 3.3 Volt) 
+#pragma message "JetExBusAtMegaSerial configured for 8Mhz"
   UBRRH = 0x00;
   UBRRL = 0x03; // 125000 Bit/s
 #else
@@ -83,8 +104,15 @@ void JetiExBusAtMegaSerial::begin(uint32_t baud, uint32_t format)
   _pInstance = this; // there is a single instance only
 
 #ifdef LED_DEBUG
-  pinMode( 13, OUTPUT);
-  digitalWrite(13, LOW ); 
+
+  pinMode( LED_JETI_TX, OUTPUT);
+  digitalWrite(LED_JETI_TX, HIGH ); 
+  pinMode( LED_JETI_RX, OUTPUT);
+  digitalWrite(LED_JETI_RX, HIGH ); 
+  delay(250);
+  digitalWrite(LED_JETI_RX, LOW ); 
+  digitalWrite(LED_JETI_TX, LOW ); 
+  
 #endif
 }
 
@@ -93,6 +121,9 @@ void JetiExBusAtMegaSerial::begin(uint32_t baud, uint32_t format)
 int JetiExBusAtMegaSerial::read(void)
 {
   uint8_t c = 0;
+  #ifdef LED_DEBUG
+  digitalWrite(LED_JETI_RX, LOW ); 
+  #endif
 
   if( m_rxNumChar ) // atomic operation
   {
@@ -109,6 +140,7 @@ int JetiExBusAtMegaSerial::read(void)
 size_t JetiExBusAtMegaSerial::write(const uint8_t *buffer, size_t size)
 {
   cli();
+  
 
   size_t ret = size;
 
@@ -130,6 +162,9 @@ size_t JetiExBusAtMegaSerial::write(const uint8_t *buffer, size_t size)
   // enable transmitter
   if( !m_bSending )
   {
+    #ifdef LED_DEBUG
+    digitalWrite(LED_JETI_TX, HIGH ); 
+    #endif
     m_bSending    = true;
     uint8_t ucsrb = UCSRB;
     ucsrb        &= ~( (1<<RXEN) | (1<<RXCIE) ); // disable receiver and receiver interrupt
@@ -167,7 +202,7 @@ ISR( USART_TX_vect )
   _pInstance->m_rxNumChar = 0;
 
 #ifdef LED_DEBUG
-  digitalWrite( 13, LOW ); 
+  digitalWrite( LED_JETI_TX, LOW ); 
 #endif
 }
 
@@ -196,12 +231,15 @@ ISR( USART_UDRE_vect )
 // ISR - receiver buffer full
 ISR( USART_RX_vect )
 {
+#ifdef LED_DEBUG
+   digitalWrite( LED_JETI_RX, HIGH ); 
+#endif   
 	*(_pInstance->m_rxHeadPtr) = UDR;   // save data to buffer
 	_pInstance->m_rxNumChar++;          // increase number of characters in buffer
 	_pInstance->m_rxHeadPtr = _pInstance->IncBufPtr8( _pInstance->m_rxHeadPtr, _pInstance->m_rxBuf, _pInstance->RX_RINGBUF_SIZE );    // increase ringbuf pointer
 
 #ifdef LED_DEBUG
-   digitalWrite( 13, HIGH ); 
+   digitalWrite( LED_JETI_RX, LOW ); 
 #endif 
 }
 

@@ -59,6 +59,7 @@ public:
 	uint8_t  GetJetiboxKey() { uint8_t b = m_nButtons; m_nButtons = 0; return b; }
 
 	bool     IsBusReleased() { bool ret = m_bBusReleased;  m_bBusReleased = false; return ret; }
+	JetiExBusSerial * getSerial() { return m_pSerial; } // for debug purposes
 
 protected:
 

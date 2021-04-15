@@ -68,6 +68,7 @@ IN THE SOFTWARE.
   {
     m_pSerial = new HardwareSerial(PB10); //PB10 / D6
     m_pSerial->setHalfDuplex();
+    m_pSerial->enableHalfDuplexRx();
 
   }
 

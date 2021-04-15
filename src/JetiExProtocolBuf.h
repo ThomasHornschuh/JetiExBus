@@ -81,12 +81,12 @@ public:
   // Jeti data types
   enum enDataType
   {
-    TYPE_6b   = 0, // int6_t  Data type 6b (-31 �31)
-    TYPE_14b  = 1, // int14_t Data type 14b (-8191 �8191)
-    TYPE_22b  = 4, // int22_t Data type 22b (-2097151 �2097151)
-    TYPE_DT   = 5, // int22_t Special data type � time and date
-    TYPE_30b  = 8, // int30_t Data type 30b (-536870911 �536870911) 
-    TYPE_GPS  = 9, // int30_t Special data type � GPS coordinates:  lo/hi minute - lo/hi degree. 
+    TYPE_6b   = 0, // int6_t  Data type 6b (-31 - 31)
+    TYPE_14b  = 1, // int14_t Data type 14b (-8191 - 8191)
+    TYPE_22b  = 4, // int22_t Data type 22b (-2097151 - 2097151)
+    TYPE_DT   = 5, // int22_t Special data type - time and date
+    TYPE_30b  = 8, // int30_t Data type 30b (-536870911 - 536870911) 
+    TYPE_GPS  = 9, // int30_t Special data type - GPS coordinates:  lo/hi minute - lo/hi degree. 
   }
   EN_DATA_TYPE;
 
@@ -164,7 +164,7 @@ protected:
   enum
   {
     // Jeti Duplex EX Ids: Manufacturer and device
-    MANUFACTURER_ID_LOW = 0x09, // 0xA409 (Jeti recommended range for 3rd party sensors is 0xA400 � 0xA41F)
+    MANUFACTURER_ID_LOW = 0x09, // 0xA409 (Jeti recommended range for 3rd party sensors is 0xA400 - 0xA41F)
     MANUFACTURER_ID_HI  = 0xA4,
     DEVICE_ID_LOW       = 0x76, // random number: 0x3276
     DEVICE_ID_HI        = 0x32,
