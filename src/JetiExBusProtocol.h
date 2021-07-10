@@ -32,11 +32,7 @@
 #ifndef JETIEXBUS_H
 #define JETIEXBUS_H
 
-#if ARDUINO >= 100
- #include <Arduino.h>
-#else
- #include <WProgram.h>
-#endif
+#include "JetiExbus_Framework.h"
 
 #include "JetiExProtocolBuf.h"
 #include "JetiExBusSerial.h"
@@ -48,7 +44,10 @@ class JetiExBusProtocol : public JetiExProtocolBuf
 public:
 	JetiExBusProtocol();
 
+    #ifdef ARDUINO
 	void    Start( const char * name, JETISENSOR_CONST * pSensorArray, int comPort = 2 );   // call once in setup(), comPort: 0=Default, Teensy: 1..3
+	#endif
+	void    Start( const char * name, JETISENSOR_CONST * pSensorArray, JetiExBusSerial *pSerial );
 	void    DoJetiExBus();              // call periodically in loop()
 
 	uint32_t HasNewChannelData() { bool b = m_bNewChannelData; m_bNewChannelData = false; return b; }

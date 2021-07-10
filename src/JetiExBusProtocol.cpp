@@ -40,21 +40,32 @@ JetiExBusProtocol::JetiExBusProtocol() : m_pSerial(NULL), m_exFrameCnt(0), m_nBu
 	memset(m_channelValues, 0, sizeof(m_channelValues));
 }
 
+#ifdef ARDUINO
 void JetiExBusProtocol::Start(const char * name, JETISENSOR_CONST * pSensorArray, int comPort)
 {
+   
+	JetiExBusSerial *pSerial = JetiExBusSerial::CreatePort( comPort );
+	pSerial->begin( 125000, SERIAL_8N1 );	
+	Start(name,pSensorArray,pSerial);
+
+}
+#endif
+
+void JetiExBusProtocol::Start( const char * name, JETISENSOR_CONST * pSensorArray, JetiExBusSerial *pSerial )
+{
+	m_pSerial = pSerial;  
 	// init jetibox text memory
 	memset(m_textBuffer, ' ', sizeof(m_textBuffer));
-
 	// init EX protocol handler
 	JetiExProtocolBuf::Init(name, pSensorArray);
 
 	// init EX bus serial port 
-	m_pSerial = JetiExBusSerial::CreatePort( comPort );
-	m_pSerial->begin( 125000, SERIAL_8N1 );
-
+	
 	ResetPacket();
 	m_exFrameCnt = 0;
 }
+
+
 
 
 uint16_t JetiExBusProtocol::GetChannel(uint8_t nChannel)

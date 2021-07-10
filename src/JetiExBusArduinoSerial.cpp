@@ -34,7 +34,9 @@ IN THE SOFTWARE.
 
 **************************************************************/
 
-#if defined (__AVR_ATmega328PB__)
+
+
+#if defined (ARDUINO_ARCH_AVR) && defined (__AVR_ATmega328PB__) 
 
 // #define LED_DEBUG
 
@@ -138,5 +140,7 @@ size_t JetiExBusArduinoSerial::write(const uint8_t *buffer, size_t size)
 	}
 	return m_pSerial->write(buffer, size);
 }
+
+
 
 #endif // __AVR_ATmega328PB__

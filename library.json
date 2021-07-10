@@ -1,0 +1,8 @@
+{
+    "name": "JetiExBusSensor",
+    "version" : "0.9.6",
+    "frameworks" : ["arduino","mbed"],
+    "platforms" : ["atmelavr","ststm32"],
+    "lib_Archive": false
+
+}

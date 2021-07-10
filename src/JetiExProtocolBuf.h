@@ -31,15 +31,7 @@
 #ifndef JETIEXPROTOCOLBUF_H
 #define JETIEXPROTOCOLBUF_H
 
-#if ARDUINO >= 100
- #include <Arduino.h>
-#else
- #include <WProgram.h>
-#endif
-
-#if !defined(ESP32) and !defined(STM32F3xx)
-  #include <new.h>
-#endif 
+#include "JetiExbus_Framework.h"
 
 // Definition of Jeti sensor (aka "Equipment")
 

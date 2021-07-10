@@ -36,6 +36,8 @@
 #ifndef JETIEXBUSARDUINOSERIAL_H
 #define JETIEXBUSARDUINOSERIAL_H
 
+#if defined (ARDUINO_ARCH_AVR) 
+
 #include "JetiExBusSerial.h"
 
 #if ARDUINO >= 100
@@ -62,5 +64,7 @@ protected:
 };
   
 #endif // __AVR_ATmega328PB__
+
+#endif
 
 #endif // JETIEXBUSARDUINOSERIAL_H
