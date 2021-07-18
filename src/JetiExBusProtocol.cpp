@@ -131,7 +131,7 @@ void JetiExBusProtocol::DoJetiExBus()
 			{
 				if (ReceiveCRCCheck() )
 				{
-					//  DumpPacket();
+					//DumpPacket();
 					m_nPacketId = m_exBusBuffer[3];
 					
 					// packet contains channel data 
@@ -294,20 +294,20 @@ uint16_t JetiExBusProtocol::crc_ccitt_update(uint16_t crc, uint8_t data)
 //////////////////////
 // debug 
 //////////////////////
-#ifdef JEXTIEXBUS_PROTOCOL_DEBUG
+#ifdef JETIEXBUS_PROTOCOL_DEBUG
 	void JetiExBusProtocol::DumpPacket()
 	{
-		Serial.println("");
-		Serial.println("--- dump start ---");
+		debug_print("");
+		debug_print("--- dump start ---");
 		for (int i = 0; i < m_nBytes; i++)
 			DumpChar(m_exBusBuffer[i]);
-		Serial.println("");
-		Serial.println("--- dump end ---");
+		debug_print("");
+		debug_print("--- dump end ---");
 	}
 
 	void JetiExBusProtocol::DumpChar(char c)
 	{
-		char buf[5];
+		char buf[6];
 		int idx = 0;
 
 		buf[idx++] = '0';
@@ -319,7 +319,7 @@ uint16_t JetiExBusProtocol::crc_ccitt_update(uint16_t crc, uint8_t data)
 		if (idx > 0 && idx < (int)sizeof( buf ) )
 			buf[idx++] = '\0';
 
-		Serial.println(buf);
+		debug_print(buf);
 	}
 #else
   void JetiExBusProtocol::DumpPacket() {}

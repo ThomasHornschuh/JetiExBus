@@ -26,6 +26,8 @@
      #define memcpy_P(...) memcpy(__VA_ARGS__)
      #define strlcpy_P(...) strlcpy(__VA_ARGS__)
 
+     inline void debug_print(const char *str) { printf(str); }
+
 
 #else
 
@@ -38,7 +40,7 @@
     #if !defined(ESP32) and !defined(STM32F3xx)
       #include <new.h>
     #endif 
-
+    #define debug_print(...) Serial.println(__VA_ARGS__)
 
 #endif
 

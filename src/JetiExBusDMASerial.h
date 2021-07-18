@@ -37,17 +37,32 @@
 #define JETI_DMA_BUF_SIZE 128
 #endif
 
+
+typedef enum {
+   juOff,
+   juPause,
+   juRun
+
+} t_juDMAState;
+
 class JetiExBusDMASerial : public JetiExBusSerial {
 private:
   UART_HandleTypeDef * huart;
   uint8_t dmaRecvBuffer[JETI_DMA_BUF_SIZE];
   uint8_t dmaTransmitBuffer[JETI_DMA_BUF_SIZE];
-  size_t receivedBytes;
-  size_t index;
   Callback<void()> _rx_complete;
   Callback<void()> _tx_complete;
   Callback<void(uint32_t)> _uart_error;
-  bool busy;
+  t_juDMAState rxState;
+  t_juDMAState txState;
+
+  
+
+  //Rx FIFO helpers
+  size_t _readIndex;
+  int lastCNDTR;
+  inline size_t readIndex() { return _readIndex; }
+  inline size_t writeIndex() { return JETI_DMA_BUF_SIZE- __HAL_DMA_GET_COUNTER(huart->hdmarx); }  
   
  
   
@@ -58,10 +73,7 @@ private:
   static void RxDMA_Abort(UART_HandleTypeDef *huart);
   static void UART_Error(UART_HandleTypeDef *huart);
 
-  //Helpers
-  static void disableTimeoutIRQ(UART_HandleTypeDef *huart);
-  bool busyCheck();
-
+  
 
 public:
   virtual void  begin(uint32_t baud, uint32_t format);
@@ -85,20 +97,37 @@ public:
   }
 
   bool Start_Receive_NB();
-  bool receiveBlocking(uint32_t timeout);
+ 
 
-    // template <typename T, typename R, typename... ArgTs>
-    // void  Start_Receive_NB(T *obj, R(T::*method)(ArgTs...), ArgTs... args)
-    // {
-    //      // TODO: Find out how this works...
-    //     //return call_every(ms, mbed::callback(obj, method), args...);
-    //     _Start_Receive_NB();
-    // }
+  bool rxDMAAbort() {
+    bool res = rxState!=juOff && HAL_UART_AbortReceive_IT(huart)==HAL_OK;
+    if (res) rxState = juOff;
+    return res;
+  }
 
-  
+  bool txDMAAbort() {
+    bool res = txState!=juOff && HAL_UART_AbortTransmit_IT(huart)==HAL_OK;
+    if (res) txState = juOff;
+    return res;
+  }
 
+  bool rxDMAPause()
+  {
+    bool res = rxState==juRun && HAL_UART_DMAPause(huart)==HAL_OK;
+    if (res) rxState=juPause;
+    return res;
+  }
+
+  bool rxDMAResume()
+  {
+    bool res = (rxState==juPause) && HAL_UART_DMAResume(huart)==HAL_OK;
+    if (res) rxState=juRun;
+    return res;
+  }
+
+    
   JetiExBusDMASerial(UART_HandleTypeDef *h):
-        huart(h),receivedBytes(0),index(0),busy(true)
+        huart(h),rxState(juOff),txState(juOff),_readIndex(0),lastCNDTR(0)
   {
     current=this;
   }
