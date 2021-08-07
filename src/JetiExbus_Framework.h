@@ -26,7 +26,12 @@
      #define memcpy_P(...) memcpy(__VA_ARGS__)
      #define strlcpy_P(...) strlcpy(__VA_ARGS__)
 
-     inline void debug_print(const char *str) { printf(str); }
+     inline void debug_print(const char *str) { 
+       #ifndef STM32F1xx
+       printf(str);
+       #endif 
+       
+     }
 
 
 #else

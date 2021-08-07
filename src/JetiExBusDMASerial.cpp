@@ -70,7 +70,8 @@ void JetiExBusDMASerial::UART_Error(UART_HandleTypeDef *huart)
 {
    
     uint32_t errorcode =  huart->ErrorCode;
-    HAL_UART_Abort(huart);   
+    HAL_UART_Abort(huart);
+    if (current) current->rxState = juOff;   
     if ( current && current->_uart_error )  current->_uart_error.call(errorcode);
     
 }
@@ -82,6 +83,7 @@ void JetiExBusDMASerial::begin(uint32_t baud, uint32_t format)
   HAL_UART_RegisterCallback(huart,HAL_UART_RX_COMPLETE_CB_ID,RxDMA_Complete);
   HAL_UART_RegisterCallback(huart,HAL_UART_ABORT_RECEIVE_COMPLETE_CB_ID,RxDMA_Abort);
   HAL_UART_RegisterCallback(huart,HAL_UART_ERROR_CB_ID,UART_Error);
+  __HAL_UART_DISABLE_IT(huart,UART_IT_ERR);
   //HAL_HalfDuplex_EnableReceiver(huart);
   
 
@@ -97,9 +99,9 @@ HAL_StatusTypeDef res;
        return 0;
     }
     memcpy(dmaTransmitBuffer,buffer,size);
-    HAL_HalfDuplex_EnableTransmitter(huart);
     rxDMAPause(); // suspend rx while sending
-    res=HAL_UART_Transmit_DMA(huart,dmaTransmitBuffer,size); // const_cast<uint8_t*>(
+    HAL_HalfDuplex_EnableTransmitter(huart);
+    res=HAL_UART_Transmit_DMA(huart,dmaTransmitBuffer,size);
     if (res!=HAL_OK) {
       debug("Error on DMA write\n");
       // In case of error re-enable rx 
@@ -116,13 +118,22 @@ bool JetiExBusDMASerial::Start_Receive_NB()
 {
 HAL_StatusTypeDef res;
 
-   
-   HAL_HalfDuplex_EnableReceiver(huart);
-   _readIndex=0;
+   if (rxState!=juOff) return false;
+
+   //HAL_HalfDuplex_EnableReceiver(huart);
+   _readIndex=0;   
+   memset(dmaRecvBuffer,0,sizeof(dmaRecvBuffer));
    res=HAL_UART_Receive_DMA(huart,dmaRecvBuffer,sizeof(dmaRecvBuffer));
+   HAL_NVIC_DisableIRQ(USART3_IRQn);
    if (res!=HAL_OK) {
+     rxState=juOff;
      debug("Error on Start_Receive_NB\n");
      return false;
+   } else {
+      __HAL_UART_DISABLE_IT(huart,UART_IT_ERR);
+      HAL_HalfDuplex_EnableReceiver(huart);
+      rxState=juRun;
+      HAL_NVIC_EnableIRQ(USART3_IRQn);
    }
    
    //debug("Start_Receive_NB succesfull\n");
@@ -133,6 +144,7 @@ HAL_StatusTypeDef res;
 
 int JetiExBusDMASerial::available(void)
 {
+   if (rxState==juOff) return 0; 
    size_t w = writeIndex();
    return ( w - _readIndex) % JETI_DMA_BUF_SIZE;
 }

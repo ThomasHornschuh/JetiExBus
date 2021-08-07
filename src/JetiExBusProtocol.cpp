@@ -148,9 +148,12 @@ void JetiExBusProtocol::DoJetiExBus()
 					// packet is a Jetibox request
 					else if (m_exBusBuffer[4] == 0x3b && m_bReleaseBus )
 					{
+						DumpPacket();
 						SendJetiBoxData();
 						m_bBusReleased = true;
 					}
+				} else {
+					debug_print("ExBus crc error\n");
 				}
 				m_state = WAIT_HDR_START;
 			}
