@@ -148,7 +148,7 @@ void JetiExBusProtocol::DoJetiExBus()
 					// packet is a Jetibox request
 					else if (m_exBusBuffer[4] == 0x3b && m_bReleaseBus )
 					{
-						DumpPacket();
+						//DumpPacket();
 						SendJetiBoxData();
 						m_bBusReleased = true;
 					}
@@ -202,7 +202,7 @@ void JetiExBusProtocol::SendJetiBoxData()
 	m_exBusBuffer[38] = (uint8_t)(crcCalc & 0xFF);
 	m_exBusBuffer[39] = (uint8_t)(crcCalc >> 8);
 
-	// DumpPacket();
+	DumpPacket();
 
 	m_pSerial->write(m_exBusBuffer, m_nBytes);
 }
