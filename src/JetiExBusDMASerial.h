@@ -91,6 +91,9 @@ public:
   virtual int available(void);
   virtual int read(void);
 
+  bool Start_Receive_DMA();
+  bool Start_Receive_IT();
+
   inline void setTxMode(t_juTransferMode m) { txMode = m; }
   inline t_juTransferMode getTXMode() { return txMode; }
 
@@ -109,8 +112,7 @@ public:
      _uart_error = f;
   }
 
-  bool Start_Receive_NB();
-  bool Start_Receive_IT();
+  
 
 
   bool rxDMAAbort() {
