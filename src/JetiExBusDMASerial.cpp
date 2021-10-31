@@ -97,7 +97,7 @@ void JetiExBusDMASerial::begin(uint32_t baud, uint32_t format)
 
   HAL_UART_RegisterCallback(huart,HAL_UART_ABORT_RECEIVE_COMPLETE_CB_ID,RxDMA_Abort);
   HAL_UART_RegisterCallback(huart,HAL_UART_ERROR_CB_ID,UART_Error);
-  __HAL_UART_DISABLE_IT(huart,UART_IT_ERR); //TODO: Check if this can be removed
+  //__HAL_UART_DISABLE_IT(huart,UART_IT_ERR); //TODO: Check if this can be removed
   //HAL_HalfDuplex_EnableReceiver(huart);
 
 
