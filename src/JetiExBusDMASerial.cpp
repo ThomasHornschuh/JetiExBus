@@ -29,14 +29,10 @@
 
 #ifdef MBED
 
-
-
 #include "JetiExBusDMASerial.h"
 #include <string.h>
 
 JetiExBusDMASerial *JetiExBusDMASerial::current=nullptr;
-
-
 
 
 void  JetiExBusDMASerial::TxDMA_Complete(UART_HandleTypeDef *huart)
