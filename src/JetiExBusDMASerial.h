@@ -96,6 +96,7 @@ public:
 
   inline void setTxMode(t_juTransferMode m) { txMode = m; }
   inline t_juTransferMode getTXMode() { return txMode; }
+  inline t_juDMAState getRXState() { return rxState; }
 
   void attachTx(Callback<void()> f)
   {

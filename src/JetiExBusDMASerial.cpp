@@ -90,7 +90,6 @@ void JetiExBusDMASerial::begin(uint32_t baud, uint32_t format)
 {
   // baud and format are dummy only
   HAL_UART_RegisterCallback(huart,HAL_UART_TX_COMPLETE_CB_ID,TxDMA_Complete);
-
   HAL_UART_RegisterCallback(huart,HAL_UART_ABORT_RECEIVE_COMPLETE_CB_ID,RxDMA_Abort);
   HAL_UART_RegisterCallback(huart,HAL_UART_ERROR_CB_ID,UART_Error);
   //__HAL_UART_DISABLE_IT(huart,UART_IT_ERR); //TODO: Check if this can be removed
@@ -189,10 +188,19 @@ HAL_StatusTypeDef res;
 
 int JetiExBusDMASerial::available(void)
 {
-   if (rxState==juOff) return 0;
-   size_t w = writeIndex();
-   if (w == _readIndex) return 0; // fifo empty
-   return ( w - _readIndex) % JETI_DMA_BUF_SIZE;
+   int result=0;
+   size_t w;
+
+   core_util_critical_section_enter();
+   if (rxState==juOff) goto leave;
+   w = writeIndex();
+   if (w == _readIndex) goto leave;; // fifo empty
+   result = ( w - _readIndex) % JETI_DMA_BUF_SIZE;
+  
+   leave:
+   core_util_critical_section_exit();
+   return result;
+
 }
 
 int JetiExBusDMASerial::read(void)
@@ -200,9 +208,11 @@ int JetiExBusDMASerial::read(void)
 int r;
 
      if (available()) {
+       core_util_critical_section_enter(); 
        r= dmaRecvBuffer[_readIndex];
        _readIndex = (_readIndex + 1) % JETI_DMA_BUF_SIZE;
        //MBED_ASSERT((_readIndex < JETI_DMA_BUF_SIZE) && (_readIndex > 0 ));
+       core_util_critical_section_exit();
        return r;
      } else {
        return 0;
